@@ -1,0 +1,55 @@
+name: CI Test
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '*.md'
+
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '*.md'
+
+env:
+  POSTGRES_HOST_AUTH_METHOD: trust
+  RAILS_ENV: test
+  PGUSER: postgres
+  PGHOST: localhost
+
+jobs:
+  minitest:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Build App
+        run: |
+          yarn
+          bin/rails db:create
+          bin/rails db:schema:load
+          bin/rails webpacker:compile
+
+      - name: Run Test
+        run: bin/rails test
