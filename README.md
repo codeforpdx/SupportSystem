@@ -22,3 +22,4 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+[Support System Schema .pdf](https://github.com/codeforpdx/SupportSystem/files/6805520/Support.System.Schema.pdf)
